@@ -1,4 +1,4 @@
-package com.w83ll43;
+package com.w83ll43.alliance;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,0 +1,12 @@
+server:
+  port: 10086
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api_route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/**
+      default-filters:
+        - AddResponseHeader=source, gateway

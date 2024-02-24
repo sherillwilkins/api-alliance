@@ -2,6 +2,7 @@ package com.w83ll43.alliance.sdk.client;
 
 import cn.hutool.json.JSONObject;
 import com.w83ll43.alliance.sdk.constant.HttpConstant;
+import com.w83ll43.alliance.sdk.constant.SDKConstant;
 import com.w83ll43.alliance.sdk.enums.Scheme;
 import com.w83ll43.alliance.sdk.exception.SDKException;
 import com.w83ll43.alliance.sdk.model.request.ApiRequest;
@@ -191,6 +192,7 @@ public class ApacheHttpClient extends BaseApiClient {
 
             // 解析响应体 Body
             apiResponse.setBytesBody(EntityUtils.toByteArray(httpResponse.getEntity()));
+            apiResponse.setStringBody(new String(apiResponse.getBytesBody(), SDKConstant.ENCODING));
 
             String contentMD5 = apiResponse.getFirstHeaderValue(HttpConstant.HTTP_HEADER_CA_CONTENT_MD5);
             if (null != contentMD5 && !"".equals(contentMD5)) {

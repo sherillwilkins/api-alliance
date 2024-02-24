@@ -1,5 +1,28 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+spring:
+  application:
+    name: api-alliance-web
+  # 配置数据源
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql:///api-alliance?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=UTF-8
+    username: root
+    password: root
 api:
   alliance:
     client:
       access-key: w83ll43
       secret-key: secret
+dubbo:
+  application:
+    name: api-alliance-provider
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    id: nacos-registry
+    address: nacos://localhost:8848

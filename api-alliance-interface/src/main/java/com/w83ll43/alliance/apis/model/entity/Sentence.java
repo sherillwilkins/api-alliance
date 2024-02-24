@@ -1,18 +1,25 @@
-package com.w83ll43.alliance.sdk.model.entity;
+package com.w83ll43.alliance.apis.model.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Data
+@TableName(value = "sentence")
 public class Sentence implements Serializable {
 
-    private static final long serialVersionUID = -3590357924996844528L;
+    @TableField(exist = false)
+    private static final long serialVersionUID = 6355628054045687685L;
 
     /**
      * 主键ID
      */
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -34,6 +41,7 @@ public class Sentence implements Serializable {
      * 来源
      * from 是 MySQL 的关键字、需要添加反引号
      */
+    @TableField(value = "`from`")
     private String from;
 
     /**

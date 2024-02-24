@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.w83ll43.alliance.apis.mapper.SentenceMapper">
+
+    <resultMap id="BaseResultMap" type="com.w83ll43.alliance.apis.model.entity.Sentence">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="uuid" column="uuid" jdbcType="VARCHAR"/>
+        <result property="hitokoto" column="hitokoto" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="CHAR"/>
+        <result property="from" column="from" jdbcType="VARCHAR"/>
+        <result property="fromWho" column="from_who" jdbcType="VARCHAR"/>
+        <result property="creator" column="creator" jdbcType="VARCHAR"/>
+        <result property="creatorUid" column="creator_uid" jdbcType="INTEGER"/>
+        <result property="reviewer" column="reviewer" jdbcType="INTEGER"/>
+        <result property="commitFrom" column="commit_from" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="length" column="length" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,uuid,hitokoto,
+        type,`from`,from_who,
+        creator,creator_uid,reviewer,
+        commit_from,created_at,length
+    </sql>
+
+    <select id="getRandomSentence" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sentence
+        order by RAND()
+        limit 1
+    </select>
+
+    <select id="getRandomSentenceByType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sentence
+        where type = #{type}
+        order by RAND()
+        limit 1
+    </select>
+</mapper>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.w83ll43.alliance.apis.mapper.JokeMapper">
+
+    <resultMap id="BaseResultMap" type="com.w83ll43.alliance.apis.model.entity.Joke">
+        <id property="tid" column="tid" jdbcType="INTEGER"/>
+        <result property="text" column="text" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        tid,text
+    </sql>
+
+    <select id="getRandomJoke" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from joke
+        order by RAND()
+        limit 1
+    </select>
+</mapper>

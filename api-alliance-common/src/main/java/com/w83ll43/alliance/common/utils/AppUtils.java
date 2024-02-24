@@ -1,4 +1,4 @@
-package com.w83ll43.alliance.utils;
+package com.w83ll43.alliance.common.utils;
 
 import com.w83ll43.alliance.common.exception.CustomException;
 import com.w83ll43.alliance.common.model.enums.ErrorEnum;
@@ -13,7 +13,7 @@ public class AppUtils {
     /**
      * 关键词
      */
-    private final static String SERVER_NAME = "OpenAPI_w83ll43";
+    private final static String SERVER_NAME = "api-alliance-w83ll43";
 
     /**
      * 字符
@@ -36,8 +36,8 @@ public class AppUtils {
     public static String getAppId() {
         StringBuilder shortBuffer = new StringBuilder();
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        for (int i = 0; i < 8; i++) {
-            String str = uuid.substring(i * 4, i * 4 + 4);
+        for (int i = 0; i < 28; i++) {
+            String str = uuid.substring(i, i + 4);
             int x = Integer.parseInt(str, 16);
             shortBuffer.append(chars[x % 0x3E]);
         }

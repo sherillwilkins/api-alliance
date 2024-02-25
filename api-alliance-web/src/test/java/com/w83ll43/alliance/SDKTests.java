@@ -1,8 +1,7 @@
 package com.w83ll43.alliance;
 
 import com.w83ll43.alliance.sdk.client.APIAllianceClient;
-import com.w83ll43.alliance.sdk.model.entity.Joke;
-import com.w83ll43.alliance.sdk.model.entity.Sentence;
+import com.w83ll43.alliance.sdk.model.response.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -16,13 +15,13 @@ public class SDKTests {
 
     @Test
     void testRandomJoke() {
-        Joke joke = allianceClient.getRandomJoke();
-        System.out.println("joke = " + joke);
+        ApiResponse apiResponse = allianceClient.getRandomJoke();
+        System.out.println("joke = " + apiResponse.getData());
     }
 
     @Test
     void testRandomSentence() {
-        Sentence sentence = allianceClient.getRandomSentence("a");
-        System.out.println("sentence = " + sentence);
+        ApiResponse apiResponse = allianceClient.getRandomSentence("a");
+        System.out.println("sentence = " + apiResponse.getData());
     }
 }

@@ -3,20 +3,46 @@ server:
   servlet:
     context-path: /api
 spring:
+  profiles:
+    active: dev
   application:
     name: api-alliance-web
   # 配置数据源
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql:///api-alliance?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=UTF-8
-    username: root
-    password: root
+    url: jdbc:mysql://${alliance.mysql.hostname}:${alliance.mysql.port}/${alliance.mysql.database}?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=UTF-8
+    username: ${alliance.mysql.username}
+    password: ${alliance.mysql.password}
+  mail:
+    # 指定邮件服务器地址
+    host: ${alliance.mail.host}
+    # 登录账户
+    username: ${alliance.mail.username}
+    # 登录密码
+    password: ${alliance.mail.password}
+    # 端口
+    port: ${alliance.mail.port}
+    # 默认编码
+    default-encoding: UTF-8
+    # 使用的协议
+    protocol: smtps
+    # 其他的属性
+    properties:
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 3000
+      mail.smtp.writetimeout: 5000
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+  thymeleaf:
+    suffix: .html
+    encoding: UTF-8
 api:
   alliance:
     client:
-      access-key: w83ll43
-      secret-key: secret
+      access-key: ${alliance.client.access-key}
+      secret-key: ${alliance.client.secret-key}
 dubbo:
   application:
     name: api-alliance-provider
@@ -25,4 +51,4 @@ dubbo:
     port: -1
   registry:
     id: nacos-registry
-    address: nacos://localhost:8848
+    address: ${alliance.dubbo.nacos.address}

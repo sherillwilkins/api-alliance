@@ -211,7 +211,7 @@ public final class ApiRequest {
      * @return
      */
     public String getFirstHeaderValue(String name){
-        if(headers.containsKey(name) && headers.get(name).size() > 0){
+        if(headers.containsKey(name) && !headers.get(name).isEmpty()){
             return headers.get(name).get(0);
         }
         return null;

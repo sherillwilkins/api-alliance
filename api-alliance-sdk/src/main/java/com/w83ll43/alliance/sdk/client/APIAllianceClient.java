@@ -25,22 +25,20 @@ public class APIAllianceClient extends ApacheHttpClient {
      * 获取随机笑话
      * @return 随机笑话
      */
-    public Joke getRandomJoke() {
+    public ApiResponse getRandomJoke() {
         String path = "/api/joke";
         ApiRequest apiRequest = new ApiRequest(HttpMethod.GET, path);
-        ApiResponse apiResponse = sendSyncRequest(apiRequest);
-        return parseResponseToEntity(apiResponse, Joke.class);
+        return sendSyncRequest(apiRequest);
     }
 
     /**
      * 获取随机句子
      * @return 随机句子
      */
-    public Sentence getRandomSentence() {
+    public ApiResponse getRandomSentence() {
         String path = "/api/sentence";
         ApiRequest apiRequest = new ApiRequest(HttpMethod.GET, path);
-        ApiResponse apiResponse = sendSyncRequest(apiRequest);
-        return parseResponseToEntity(apiResponse, Sentence.class);
+        return sendSyncRequest(apiRequest);
     }
 
     /**
@@ -48,12 +46,11 @@ public class APIAllianceClient extends ApacheHttpClient {
      * @param type 句子类型
      * @return 随机句子
      */
-    public Sentence getRandomSentence(String type) {
+    public ApiResponse getRandomSentence(String type) {
         String path = "/api/sentence/[type]";
         ApiRequest apiRequest = new ApiRequest(HttpMethod.GET, path);
         apiRequest.addParam("type", type, ParamPosition.PATH, true);
-        ApiResponse apiResponse = sendSyncRequest(apiRequest);
-        return parseResponseToEntity(apiResponse, Sentence.class);
+        return sendSyncRequest(apiRequest);
     }
 
     private <T> T parseResponseToEntity(ApiResponse apiResponse, Class<T> clazz) {

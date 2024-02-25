@@ -1,7 +1,11 @@
 package com.w83ll43.alliance.gateway.filter;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
+import com.w83ll43.alliance.common.utils.AppUtils;
 import com.w83ll43.alliance.sdk.constant.SDKConstant;
 import com.w83ll43.alliance.sdk.enums.HttpMethod;
+import com.w83ll43.alliance.sdk.enums.Scheme;
 import com.w83ll43.alliance.sdk.model.request.ApiRequest;
 import com.w83ll43.alliance.sdk.utils.ApiRequestMaker;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +27,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -50,32 +53,25 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         String timestamp = headers.getFirst(SDKConstant.X_CA_TIMESTAMP);
         String nonce = headers.getFirst(SDKConstant.X_CA_NONCE);
 
-        String appSecret = "secret";
-
         ServerHttpResponse response = exchange.getResponse();
         // 5、TODO 判断接口是否存在
 
         // 6、验证签名是否有效
+        if (StrUtil.hasEmpty(appKey, sign, nonce, timestamp)) {
+            log.info("标识 {}, 必要请求头不存在！", request.getId());
+            response.setStatusCode(HttpStatus.BAD_REQUEST);
+            return response.setComplete();
+        }
         // 验证时间戳是否过期
         long currentTime = System.currentTimeMillis() / 1000;
-        if ((currentTime - Long.parseLong(Optional.ofNullable(timestamp).orElse("0"))) >= FIVE_MINUTES) {
+        if (currentTime - Long.parseLong(timestamp) >= FIVE_MINUTES) {
             log.info("标识 {}, 重放请求!", request.getId());
             response.setStatusCode(HttpStatus.FORBIDDEN);
             return response.setComplete();
         }
-        String path = request.getPath().value();
-        ApiRequest apiRequest = new ApiRequest(HttpMethod.GET, path);
 
-        // TODO 接口地址
-        apiRequest.setHost("localhost:8082");
-        apiRequest.addHeader(SDKConstant.X_CA_TIMESTAMP, timestamp);
-        apiRequest.addHeader(SDKConstant.X_CA_NONCE, nonce);
-
-        // 为请求添加请求头
-        ApiRequestMaker.make(apiRequest, appKey, appSecret);
-
-        // 重新生成签名
-        String signature = apiRequest.getHeaders().get(SDKConstant.X_CA_SIGNATURE.toLowerCase()).get(0);
+        // 获取重新生成的签名
+        String signature = reGenSign(request, timestamp, nonce, appKey);
 
         if (!signature.equals(sign)) {
             log.info("标识 {}, 签名验证失败!", request.getId());
@@ -85,6 +81,33 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
         log.info("标识 {}, 签名验证成功!", request.getId());
         return handleResponse(exchange, chain);
+    }
+
+    private static String reGenSign(ServerHttpRequest request, String timestamp, String nonce, String appKey) {
+        String path = request.getPath().value();
+        ApiRequest apiRequest = new ApiRequest(HttpMethod.GET, path);
+
+        // 无需生成随机数
+        apiRequest.setHost(request.getURI().getHost());
+        apiRequest.setScheme(Scheme.valueOf(request.getURI().getScheme()));
+        apiRequest.setPath(path);
+        apiRequest.setQuerys(request.getQueryParams());
+        apiRequest.setGenerateNonce(false);
+        apiRequest.setCurrentDate(DateUtil.date(Long.parseLong(timestamp)));
+        request.getHeaders().forEach((headerName, headerValues) -> {
+            headerValues.forEach(headerValue -> {
+                apiRequest.addHeader(headerName, headerValue);
+            });
+        });
+        apiRequest.addHeader(SDKConstant.X_CA_TIMESTAMP, timestamp);
+        apiRequest.addHeader(SDKConstant.X_CA_NONCE, nonce);
+
+        String appSecret = AppUtils.getAppSecret(appKey);
+
+        // 为请求添加请求头（同时重新生成签名）
+        ApiRequestMaker.make(apiRequest, appKey, appSecret);
+
+        return apiRequest.getHeaders().get(SDKConstant.X_CA_SIGNATURE.toLowerCase()).get(0);
     }
 
     private Mono<Void> handleResponse(ServerWebExchange exchange, GatewayFilterChain chain) {

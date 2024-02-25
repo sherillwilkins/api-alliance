@@ -113,9 +113,9 @@ public class SignUtil {
             signatureHeaders = signatureHeaders.toLowerCase();
             String[] signatureHeaderList = signatureHeaders.split(",");
 
-            for (int i = 0; i < signatureHeaderList.length; i++) {
-                if (apiResponse.getFirstHeaderValue(signatureHeaderList[i]) != null) {
-                    stringBuilder.append(apiResponse.getFirstHeaderValue(signatureHeaderList[i]));
+            for (String s : signatureHeaderList) {
+                if (apiResponse.getFirstHeaderValue(s) != null) {
+                    stringBuilder.append(apiResponse.getFirstHeaderValue(s));
                     stringBuilder.append(SDKConstant.LF);
                 }
             }
@@ -167,7 +167,7 @@ public class SignUtil {
                 }
                 stringBuilder.append(key);
                 String value = parameter.get(key);
-                if (null != value && !"".equals(value)) {
+                if (null != value && !value.isEmpty()) {
                     stringBuilder.append("=").append(value);
                 }
             }
@@ -193,7 +193,7 @@ public class SignUtil {
         int flag = 0;
         for (Map.Entry<String, List<String>> header : apiRequest.getHeaders().entrySet()) {
             // 如果请求头包含 "X-Ca" 则参与签名
-            if (header.getKey().startsWith(SDKConstant.CA_HEADER_TO_SIGN_PREFIX_SYSTEM)) {
+            if (header.getKey().startsWith(SDKConstant.CA_HEADER_TO_SIGN_PREFIX_SYSTEM.toLowerCase())) {
                 if (flag != 0) {
                     signHeadersStringBuilder.append(",");
                 }

@@ -1,5 +1,6 @@
 package com.w83ll43.alliance.sdk.model.response;
 
+import cn.hutool.json.JSONObject;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,7 +11,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 
-public final class ApiResponse{
+public final class ApiResponse {
 
     /**
      * 响应状态码
@@ -21,6 +22,14 @@ public final class ApiResponse{
      * 响应消息
      */
     private String message;
+
+    private JSONObject data;
+
+    /**
+     * 动态数据
+     */
+    private Map<String, Object> map = new HashMap<>();
+
 
     /**
      * 响应内容类型
@@ -47,11 +56,11 @@ public final class ApiResponse{
      */
     private String stringBody;
 
-    public ApiResponse(int code){
+    public ApiResponse(int code) {
         this.code = code;
     }
 
-    public ApiResponse(int errorCode, String message, Exception ex){
+    public ApiResponse(int errorCode, String message, Exception ex) {
         this.code = errorCode;
         this.message = message;
         this.ex = ex;
@@ -62,8 +71,8 @@ public final class ApiResponse{
      * @param name
      * @return
      */
-    public String getFirstHeaderValue(String name){
-        if(headers.containsKey(name) && !headers.get(name).isEmpty()){
+    public String getFirstHeaderValue(String name) {
+        if (headers.containsKey(name) && !headers.get(name).isEmpty()) {
             return headers.get(name).get(0);
         }
         return null;
@@ -71,10 +80,10 @@ public final class ApiResponse{
 
     /**
      * 添加请求头
-     * @param name 键
+     * @param name  键
      * @param value 值
      */
-    public void addHeader(String name, String value){
+    public void addHeader(String name, String value) {
         name = name.trim().toLowerCase();
         addParam(name, value, headers);
     }
@@ -85,8 +94,8 @@ public final class ApiResponse{
      * @param value
      * @param map
      */
-    public void addParam(String name, String value, Map<String, List<String>> map){
-        if(map.containsKey(name)){
+    public void addParam(String name, String value, Map<String, List<String>> map) {
+        if (map.containsKey(name)) {
             map.get(name).add(value);
         } else {
             List<String> values = new ArrayList<>();
@@ -97,7 +106,7 @@ public final class ApiResponse{
 
     public ApiResponse(JsonNode jsonObject) throws IOException, JsonParseException, JsonMappingException {
         this.parse(jsonObject);
-        if(jsonObject.get("status") != null) {
+        if (jsonObject.get("status") != null) {
             this.code = Integer.parseInt(jsonObject.get("status").asText());
         }
         this.contentType = getFirstHeaderValue(HttpConstant.HTTP_HEADER_CONTENT_TYPE);
@@ -106,14 +115,14 @@ public final class ApiResponse{
         }
     }
 
-    public void parse(JsonNode message){
+    public void parse(JsonNode message) {
         JsonNode headers = message.get("header");
-        if(headers != null && headers.size() > 0) {
+        if (headers != null && !headers.isEmpty()) {
             Iterator<String> names = headers.fieldNames();
             while (names.hasNext()) {
                 String name = names.next();
                 if (headers.get(name) != null) {
-                    if (headers.get(name).size() > 0) {
+                    if (!headers.get(name).isEmpty()) {
                         for (JsonNode value : headers.get(name)) {
                             addHeader(name, value.asText());
                         }
@@ -126,25 +135,41 @@ public final class ApiResponse{
 
         String contentType = this.getFirstHeaderValue(HttpConstant.HTTP_HEADER_CONTENT_TYPE);
         Charset charset = SDKConstant.ENCODING;
-        if(null  != contentType){
-            try{
+        if (null != contentType) {
+            try {
                 contentType = contentType.toLowerCase();
                 String[] charsetStr = contentType.split(";");
-                for(int i = 0 ; i < charsetStr.length ; i++){
-                    if(charsetStr[i].contains("charset")){
-                        charset = Charset.forName(charsetStr[i].substring(charsetStr[i].indexOf("=") + 1));
+                for (String s : charsetStr) {
+                    if (s.contains("charset")) {
+                        charset = Charset.forName(s.substring(s.indexOf("=") + 1));
                     }
                 }
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
 
         JsonNode bodyNode = message.get("body");
-        if(bodyNode != null){
+        if (bodyNode != null) {
             stringBody = bodyNode.asText();
             bytesBody = stringBody.getBytes(charset);
         }
+    }
+
+    public JSONObject getData() {
+        return data;
+    }
+
+    public void setData(JSONObject data) {
+        this.data = data;
+    }
+
+    public Map<String, Object> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, Object> map) {
+        this.map = map;
     }
 
     public int getCode() {

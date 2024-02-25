@@ -1,6 +1,7 @@
 package com.w83ll43.alliance.sdk.client;
 
 import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.w83ll43.alliance.sdk.constant.HttpConstant;
 import com.w83ll43.alliance.sdk.constant.SDKConstant;
 import com.w83ll43.alliance.sdk.enums.Scheme;
@@ -112,10 +113,11 @@ public class ApacheHttpClient extends BaseApiClient {
         EntityBuilder bodyBuilder = EntityBuilder.create();
 
         // 设置请求数据类型
-        if (null == apiRequest.getFirstHeaderValue(HttpConstant.HTTP_HEADER_CONTENT_TYPE)) {
+        String requestContentType = apiRequest.getFirstHeaderValue(HttpConstant.HTTP_HEADER_CONTENT_TYPE);
+        if (null == requestContentType) {
             bodyBuilder.setContentType(ContentType.parse(apiRequest.getMethod().getRequestContentType()));
         } else {
-            bodyBuilder.setContentType(ContentType.parse(apiRequest.getFirstHeaderValue(HttpConstant.HTTP_HEADER_CONTENT_TYPE)));
+            bodyBuilder.setContentType(ContentType.parse(requestContentType));
         }
 
         // 设置请求的 JSON 数据
@@ -192,10 +194,12 @@ public class ApacheHttpClient extends BaseApiClient {
 
             // 解析响应体 Body
             apiResponse.setBytesBody(EntityUtils.toByteArray(httpResponse.getEntity()));
-            apiResponse.setStringBody(new String(apiResponse.getBytesBody(), SDKConstant.ENCODING));
+            String body = new String(apiResponse.getBytesBody(), SDKConstant.ENCODING);
+            apiResponse.setStringBody(body);
+            apiResponse.setData(JSONUtil.parseObj(body));
 
             String contentMD5 = apiResponse.getFirstHeaderValue(HttpConstant.HTTP_HEADER_CA_CONTENT_MD5);
-            if (null != contentMD5 && !"".equals(contentMD5)) {
+            if (null != contentMD5 && !contentMD5.isEmpty()) {
                 // 消息摘要
                 String localContentMd5 = SignUtil.messageDigest(apiResponse.getBytesBody());
                 if (!contentMD5.equalsIgnoreCase(localContentMd5)) {

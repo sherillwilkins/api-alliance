@@ -1,5 +1,6 @@
 package com.w83ll43.alliance.sdk.client;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.w83ll43.alliance.sdk.constant.HttpConstant;
@@ -28,6 +29,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -195,9 +198,10 @@ public class ApacheHttpClient extends BaseApiClient {
             // 解析响应体 Body
             apiResponse.setBytesBody(EntityUtils.toByteArray(httpResponse.getEntity()));
             String body = new String(apiResponse.getBytesBody(), SDKConstant.ENCODING);
-            apiResponse.setStringBody(body);
-            apiResponse.setData(JSONUtil.parseObj(body));
-
+            if (StrUtil.isNotEmpty(body)) {
+                apiResponse.setStringBody(body);
+                apiResponse.setData(JSONUtil.parseObj(body));
+            }
             String contentMD5 = apiResponse.getFirstHeaderValue(HttpConstant.HTTP_HEADER_CA_CONTENT_MD5);
             if (null != contentMD5 && !contentMD5.isEmpty()) {
                 // 消息摘要
@@ -228,6 +232,8 @@ public class ApacheHttpClient extends BaseApiClient {
         try {
             httpResponse = httpClient.execute(httpRequest);
             return parseToApiResponse(httpResponse);
+        } catch (SocketTimeoutException e) {
+            return new ApiResponse(408, "请求超时", e);
         } catch (IOException e) {
             throw new SDKException(e);
         } finally {

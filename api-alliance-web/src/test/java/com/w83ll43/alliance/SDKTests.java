@@ -24,4 +24,12 @@ public class SDKTests {
         ApiResponse apiResponse = allianceClient.getRandomSentence("a");
         System.out.println("sentence = " + apiResponse.getData());
     }
+
+    @Test
+    void testRequestRateLimiter() {
+        for (int i = 0; i < 100; i++) {
+            ApiResponse apiResponse = allianceClient.getRandomSentence("a");
+            System.out.println("sentence " + i  + " = " + apiResponse);
+        }
+    }
 }

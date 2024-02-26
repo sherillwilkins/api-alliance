@@ -6,11 +6,13 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.w83ll43.alliance.sdk.constant.HttpConstant;
 import com.w83ll43.alliance.sdk.constant.SDKConstant;
+import lombok.Data;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 
+@Data
 public final class ApiResponse {
 
     /**
@@ -154,77 +156,5 @@ public final class ApiResponse {
             stringBody = bodyNode.asText();
             bytesBody = stringBody.getBytes(charset);
         }
-    }
-
-    public JSONObject getData() {
-        return data;
-    }
-
-    public void setData(JSONObject data) {
-        this.data = data;
-    }
-
-    public Map<String, Object> getMap() {
-        return map;
-    }
-
-    public void setMap(Map<String, Object> map) {
-        this.map = map;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Exception getEx() {
-        return ex;
-    }
-
-    public void setEx(Exception ex) {
-        this.ex = ex;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
-    public Map<String, List<String>> getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(Map<String, List<String>> headers) {
-        this.headers = headers;
-    }
-
-    public byte[] getBytesBody() {
-        return bytesBody;
-    }
-
-    public void setBytesBody(byte[] bytesBody) {
-        this.bytesBody = bytesBody;
-    }
-
-    public String getStringBody() {
-        return stringBody;
-    }
-
-    public void setStringBody(String stringBody) {
-        this.stringBody = stringBody;
     }
 }

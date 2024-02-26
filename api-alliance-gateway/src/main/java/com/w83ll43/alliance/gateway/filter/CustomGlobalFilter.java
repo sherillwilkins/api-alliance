@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import com.w83ll43.alliance.common.utils.AppUtils;
 import com.w83ll43.alliance.sdk.constant.SDKConstant;
 import com.w83ll43.alliance.sdk.enums.HttpMethod;
-import com.w83ll43.alliance.sdk.enums.Scheme;
 import com.w83ll43.alliance.sdk.model.request.ApiRequest;
 import com.w83ll43.alliance.sdk.utils.ApiRequestMaker;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +88,6 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
         // 无需生成随机数
         apiRequest.setHost(request.getURI().getHost());
-        apiRequest.setScheme(Scheme.valueOf(request.getURI().getScheme()));
         apiRequest.setPath(path);
         apiRequest.setQuerys(request.getQueryParams());
         apiRequest.setGenerateNonce(false);

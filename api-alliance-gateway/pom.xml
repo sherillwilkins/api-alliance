@@ -51,6 +51,11 @@
             <artifactId>nacos-client</artifactId>
         </dependency>
 
+        <!-- 响应式 redis 用于限流 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

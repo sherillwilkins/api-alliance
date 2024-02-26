@@ -1,8 +1,11 @@
 package com.w83ll43.alliance.sdk.enums;
 
+import lombok.Getter;
+
 /**
  * 请求协议
  */
+@Getter
 public enum Scheme {
 
     HTTP("HTTP"),
@@ -13,9 +16,5 @@ public enum Scheme {
 
     Scheme(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return this.value;
     }
 }

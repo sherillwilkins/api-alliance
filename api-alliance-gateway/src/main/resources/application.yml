@@ -1,6 +1,10 @@
 server:
   port: 10086
 spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
   cloud:
     gateway:
       routes:
@@ -8,8 +12,13 @@ spring:
           uri: http://localhost:8088
           predicates:
             - Path=/api/**
-      default-filters:
-        - AddResponseHeader=source, gateway
+          filters:
+            - AddRequestHeader=X-Ca-Source, api-alliance-gateway
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1   # 令牌桶每秒填充速率 每秒可请求数
+                redis-rate-limiter.burstCapacity: 3   # 令牌桶总容量 允许突发的请求数
+                key-resolver: "#{@keyResolver}"   # 使用 SpEL 表达式按名称引用 bean
 logging:
   level:
     org:

@@ -1,12 +1,16 @@
 package com.w83ll43.alliance.sdk.model.request;
 
-import com.w83ll43.alliance.sdk.signature.HMacSHA256SignerFactory;
 import com.w83ll43.alliance.sdk.enums.HttpMethod;
 import com.w83ll43.alliance.sdk.enums.ParamPosition;
 import com.w83ll43.alliance.sdk.enums.Scheme;
 import com.w83ll43.alliance.sdk.exception.SDKException;
+import com.w83ll43.alliance.sdk.signature.HMacSHA256SignerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class ApiRequest {
 
@@ -109,10 +113,10 @@ public final class ApiRequest {
 
     /**
      * 添加请求头
-     * @param name 键
+     * @param name  键
      * @param value 值
      */
-    public void addHeader(String name, String value){
+    public void addHeader(String name, String value) {
         // 去除不可见符号并转为小写
         name = name.trim().toLowerCase();
         addParam(name, value, headers);
@@ -124,9 +128,9 @@ public final class ApiRequest {
      * @param value
      * @param map
      */
-    public void addParam(String name, String value, Map<String, List<String>> map){
+    public void addParam(String name, String value, Map<String, List<String>> map) {
         // 键已经存在
-        if(map.containsKey(name)){
+        if (map.containsKey(name)) {
             map.get(name).add(value);
         } else {
             List<String> values = new ArrayList<>();
@@ -195,11 +199,11 @@ public final class ApiRequest {
             }
         }
 
-        if(position == ParamPosition.PATH){
+        if (position == ParamPosition.PATH) {
             throw new SDKException(String.format("路径参数 %s 不支持数组类型", name));
         }
 
-        for(String str : value){
+        for (String str : value) {
             addParam(name, str, position, isRequired);
         }
 
@@ -210,8 +214,8 @@ public final class ApiRequest {
      * @param name
      * @return
      */
-    public String getFirstHeaderValue(String name){
-        if(headers.containsKey(name) && !headers.get(name).isEmpty()){
+    public String getFirstHeaderValue(String name) {
+        if (headers.containsKey(name) && !headers.get(name).isEmpty()) {
             return headers.get(name).get(0);
         }
         return null;
@@ -221,12 +225,12 @@ public final class ApiRequest {
      * 复制 API 请求
      * @return
      */
-    public ApiRequest duplicate(){
-        ApiRequest apiRequest = new ApiRequest(method , path , bytesBody);
-        if(null != host) {
+    public ApiRequest duplicate() {
+        ApiRequest apiRequest = new ApiRequest(method, path, bytesBody);
+        if (null != host) {
             apiRequest.host = host;
         }
-        if(null != url) {
+        if (null != url) {
             apiRequest.url = url;
         }
         apiRequest.pathParams = new HashMap<>();
@@ -241,7 +245,7 @@ public final class ApiRequest {
         apiRequest.formParams = new HashMap<>();
         apiRequest.formParams.putAll(formParams);
 
-        if(null != signatureMethod) {
+        if (null != signatureMethod) {
             apiRequest.signatureMethod = signatureMethod;
         }
         return apiRequest;

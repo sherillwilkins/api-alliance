@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.w83ll43.alliance.mapper.ApiMapper">
+
+    <resultMap id="BaseResultMap" type="com.w83ll43.alliance.common.model.entity.Api">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="image" column="image" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="method" column="method" jdbcType="TINYINT"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="requestParams" column="request_params" jdbcType="VARCHAR"/>
+        <result property="responseParams" column="response_params" jdbcType="VARCHAR"/>
+        <result property="requestHeader" column="request_header" jdbcType="VARCHAR"/>
+        <result property="responseHeader" column="response_header" jdbcType="VARCHAR"/>
+        <result property="returnType" column="return_type" jdbcType="TINYINT"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,image,name,
+        url,method,description,
+        request_params,response_params,request_header,
+        response_header,return_type,status,
+        create_time,update_time,is_delete
+    </sql>
+</mapper>

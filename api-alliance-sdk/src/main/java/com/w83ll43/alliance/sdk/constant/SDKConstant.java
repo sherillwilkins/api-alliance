@@ -8,6 +8,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class SDKConstant {
 
+    // 请求来源 Header
+    public static final String X_CA_REQUEST_FROM = "X-Ca-Request-From";
+
+    // 请求 ID Header 与请求来源 Header 结合用于在线测试 api 的校验
+    public static final String X_CA_REQUEST_ID = "X-Ca-Request-Id";
+
     // 签名 Header
     public static final String X_CA_SIGNATURE = "X-Ca-Signature";
 

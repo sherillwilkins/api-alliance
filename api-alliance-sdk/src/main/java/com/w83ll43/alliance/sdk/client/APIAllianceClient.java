@@ -47,9 +47,9 @@ public class APIAllianceClient extends ApacheHttpClient {
      * @return 随机句子
      */
     public ApiResponse getRandomSentence(String type) {
-        String path = "/api/sentence/[type]";
+        String path = "/api/sentence";
         ApiRequest apiRequest = new ApiRequest(HttpMethod.GET, path);
-        apiRequest.addParam("type", type, ParamPosition.PATH, true);
+        apiRequest.addParam("type", type, ParamPosition.QUERY, true);
         return sendSyncRequest(apiRequest);
     }
 

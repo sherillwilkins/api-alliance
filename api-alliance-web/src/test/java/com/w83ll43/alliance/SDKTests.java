@@ -28,8 +28,9 @@ public class SDKTests {
     @Test
     void testRequestRateLimiter() {
         for (int i = 0; i < 100; i++) {
-            ApiResponse apiResponse = allianceClient.getRandomSentence("a");
-            System.out.println("sentence " + i  + " = " + apiResponse);
+            ApiResponse apiResponse = allianceClient.getRandomJoke();
+            if (apiResponse.getEx() != null) break;
+            System.out.println("joke " + i  + " = " + apiResponse);
         }
     }
 }

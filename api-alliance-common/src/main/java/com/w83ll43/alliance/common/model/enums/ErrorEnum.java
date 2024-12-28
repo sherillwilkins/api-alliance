@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ErrorEnum {
+    OPERATION_ERROR(5001, "操作失败"),
     PARAM_INVALID(5400, "参数校验失败"),
     SYSTEM_ERROR(5500, "系统出小差了，请稍后再试哦~~"),
     ;

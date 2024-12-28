@@ -1,6 +1,6 @@
 package com.w83ll43.alliance.apis.handler;
 
-import com.w83ll43.alliance.common.exception.CustomException;
+import com.w83ll43.alliance.common.exception.BusinessException;
 import com.w83ll43.alliance.common.model.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,8 +21,8 @@ public class GlobalExceptionHandler {
      * @return 失败结果
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(CustomException.class)
-    public Result<String> exceptionHandler(CustomException e) {
+    @ExceptionHandler(BusinessException.class)
+    public Result<String> exceptionHandler(BusinessException e) {
         log.error(e.getMessage());
         return Result.error(5400, e.getMessage());
     }

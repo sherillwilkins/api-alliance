@@ -1,13 +1,17 @@
 package com.w83ll43.alliance.gateway.filter;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import com.w83ll43.alliance.common.utils.AppUtils;
+import com.w83ll43.alliance.common.model.entity.Api;
+import com.w83ll43.alliance.common.model.entity.User;
+import com.w83ll43.alliance.common.service.InnerApiService;
+import com.w83ll43.alliance.common.service.InnerUserApiInvokeService;
+import com.w83ll43.alliance.common.service.InnerUserService;
 import com.w83ll43.alliance.sdk.constant.SDKConstant;
 import com.w83ll43.alliance.sdk.enums.HttpMethod;
 import com.w83ll43.alliance.sdk.model.request.ApiRequest;
 import com.w83ll43.alliance.sdk.utils.ApiRequestMaker;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -33,6 +37,15 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
     private static final Long FIVE_MINUTES = 60 * 5L;
 
+    @DubboReference
+    private InnerUserService innerUserService;
+
+    @DubboReference
+    private InnerApiService innerApiService;
+
+    @DubboReference
+    private InnerUserApiInvokeService innerUserApiInvokeService;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 1、用户发送请求到 API 网关
@@ -43,17 +56,26 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                 request.getId(), request.getMethod(), request.getPath(),
                 request.getQueryParams(), request.getRemoteAddress());
 
+        HttpHeaders headers = request.getHeaders();
+        if ("api-alliance-web-front".equals(headers.getFirst(SDKConstant.X_CA_REQUEST_FROM))) {
+            // TODO 判断 X-Ca-Request-id 是否存在 Redis 中
+            return chain.filter(exchange);
+        }
+
         // 3、TODO 黑白名单
 
         // 4、用户鉴权（判断 ak、sk 是否合法）
-        HttpHeaders headers = request.getHeaders();
         String appKey = headers.getFirst(SDKConstant.X_CA_KEY);
         String sign = headers.getFirst(SDKConstant.X_CA_SIGNATURE);
         String timestamp = headers.getFirst(SDKConstant.X_CA_TIMESTAMP);
         String nonce = headers.getFirst(SDKConstant.X_CA_NONCE);
 
+        User user = innerUserService.getUserByAccessKey(appKey);
+        String appSecret = user.getSecretKey();
+
         ServerHttpResponse response = exchange.getResponse();
         // 5、TODO 判断接口是否存在
+        Api api = innerApiService.getApiByPathAndMethod(request.getPath().value(), request.getMethod().name());
 
         // 6、验证签名是否有效
         if (StrUtil.hasEmpty(appKey, sign, nonce, timestamp)) {
@@ -63,14 +85,16 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         }
         // 验证时间戳是否过期
         long currentTime = System.currentTimeMillis() / 1000;
-        if (currentTime - Long.parseLong(timestamp) >= FIVE_MINUTES) {
+        if (timestamp != null && currentTime - Long.parseLong(timestamp) >= FIVE_MINUTES) {
             log.info("标识 {}, 重放请求!", request.getId());
             response.setStatusCode(HttpStatus.FORBIDDEN);
             return response.setComplete();
         }
 
+
+
         // 获取重新生成的签名
-        String signature = reGenSign(request, timestamp, nonce, appKey);
+        String signature = reGenSign(request, timestamp, nonce, appKey, appSecret);
 
         if (!signature.equals(sign)) {
             log.info("标识 {}, 签名验证失败!", request.getId());
@@ -79,19 +103,18 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         }
 
         log.info("标识 {}, 签名验证成功!", request.getId());
-        return handleResponse(exchange, chain);
+        return handleResponse(exchange, chain, user, api);
     }
 
-    private static String reGenSign(ServerHttpRequest request, String timestamp, String nonce, String appKey) {
+    private static String reGenSign(ServerHttpRequest request, String timestamp, String nonce, String appKey, String appSecret) {
         String path = request.getPath().value();
-        ApiRequest apiRequest = new ApiRequest(HttpMethod.GET, path);
+        ApiRequest apiRequest = new ApiRequest(HttpMethod.valueOf(request.getMethod().name()), path);
 
         // 无需生成随机数
         apiRequest.setHost(request.getURI().getHost());
         apiRequest.setPath(path);
         apiRequest.setQuerys(request.getQueryParams());
         apiRequest.setGenerateNonce(false);
-        apiRequest.setCurrentDate(DateUtil.date(Long.parseLong(timestamp)));
         request.getHeaders().forEach((headerName, headerValues) -> {
             headerValues.forEach(headerValue -> {
                 apiRequest.addHeader(headerName, headerValue);
@@ -100,15 +123,13 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         apiRequest.addHeader(SDKConstant.X_CA_TIMESTAMP, timestamp);
         apiRequest.addHeader(SDKConstant.X_CA_NONCE, nonce);
 
-        String appSecret = AppUtils.getAppSecret(appKey);
-
         // 为请求添加请求头（同时重新生成签名）
         ApiRequestMaker.make(apiRequest, appKey, appSecret);
 
         return apiRequest.getHeaders().get(SDKConstant.X_CA_SIGNATURE.toLowerCase()).get(0);
     }
 
-    private Mono<Void> handleResponse(ServerWebExchange exchange, GatewayFilterChain chain) {
+    private Mono<Void> handleResponse(ServerWebExchange exchange, GatewayFilterChain chain, User user, Api api) {
         try {
             // 获取原始响应对象
             ServerHttpResponse originalResponse = exchange.getResponse();
@@ -125,7 +146,8 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                             // 拼接字符串
                             return super.writeWith(
                                     Flux.from(body).map(dataBuffer -> {
-                                        // 7、 TODO 调用成功 接口调用次数 + 1
+                                        // 7、调用成功 接口调用次数 + 1
+                                        innerUserApiInvokeService.invoke(api.getId(), user, 2L);
                                         byte[] content = new byte[dataBuffer.readableByteCount()];
                                         dataBuffer.read(content);
                                         DataBufferUtils.release(dataBuffer); // 释放掉内存

@@ -13,15 +13,18 @@
         <result property="secretKey" column="secret_key" jdbcType="VARCHAR"/>
         <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
         <result property="profile" column="profile" jdbcType="VARCHAR"/>
-        <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
+        <result property="balance" column="balance" jdbcType="BIGINT"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,nickname,username,
         password,access_key,secret_key,
-        avatar,profile,is_deleted,
-        create_time,update_time
+        avatar,profile,balance,
+        status,create_time,update_time,
+        is_delete
     </sql>
 </mapper>

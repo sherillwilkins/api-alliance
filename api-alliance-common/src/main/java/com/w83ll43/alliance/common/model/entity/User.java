@@ -1,28 +1,21 @@
 package com.w83ll43.alliance.common.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 用户表
+ * 用户信息表
  */
 @Data
 @TableName(value = "user")
 public class User implements Serializable {
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = -1534827680373466081L;
-
     /**
      * 用户 ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private Long id;
 
     /**
@@ -68,20 +61,35 @@ public class User implements Serializable {
     private String profile;
 
     /**
-     * 是否删除
+     * 钱包余额
      */
-    @TableField(value = "is_deleted")
-    private Integer isDeleted;
+    @TableField(value = "balance")
+    private Long balance;
+
+    /**
+     * 用户状态 0-正常 1-封号
+     */
+    @TableField(value = "status")
+    private Integer status;
 
     /**
      * 创建时间
      */
-    @TableField(value = "create_time")
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private Date createTime;
 
     /**
      * 更新时间
      */
-    @TableField(value = "update_time")
+    @TableField(value = "update_time", fill = FieldFill.UPDATE)
     private Date updateTime;
+
+    /**
+     * 是否删除
+     */
+    @TableField(value = "is_delete")
+    private Integer isDelete;
+
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
 }

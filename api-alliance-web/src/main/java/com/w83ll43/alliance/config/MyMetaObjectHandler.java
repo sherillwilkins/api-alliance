@@ -25,6 +25,7 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         // 插入数据填充默认版本号为1
         // 只支持 int,Integer,long,Long,Date,Timestamp,LocalDateTime这些数据类型
         this.strictInsertFill(metaObject, "version", () -> 1, Integer.class);
+        this.strictInsertFill(metaObject, "isDelete", () -> 0, Integer.class);
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.w83ll43.alliance.common.utils;
 
-import com.w83ll43.alliance.common.exception.CustomException;
+import com.w83ll43.alliance.common.exception.BusinessException;
 import com.w83ll43.alliance.common.model.enums.ErrorEnum;
 
 import java.security.MessageDigest;
@@ -13,7 +13,7 @@ public class AppUtils {
     /**
      * 关键词
      */
-    private final static String SERVER_NAME = "api-alliance-w83ll43";
+    private final static String SERVER_NAME = "api-alliance";
 
     /**
      * 字符
@@ -75,7 +75,7 @@ public class AppUtils {
             }
             return hex.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new CustomException(ErrorEnum.SYSTEM_ERROR.getCode(), ErrorEnum.SYSTEM_ERROR.getMessage());
+            throw new BusinessException(ErrorEnum.SYSTEM_ERROR.getCode(), ErrorEnum.SYSTEM_ERROR.getMessage());
         }
     }
 }
